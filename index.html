@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bản Đồ Tọa Độ – Việt Nam</title>
+
+  <!-- Leaflet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo-dot"></div>
+    <h1>BẢN ĐỒ <span>TỌA ĐỘ</span> VIỆT NAM</h1>
+  </div>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value" id="total-count">–</div>
+      <div class="stat-label">Tổng điểm</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="last-update">–</div>
+      <div class="stat-label">Cập nhật</div>
+    </div>
+  </div>
+</header>
+
+<div id="status-bar">
+  <div id="status-indicator"></div>
+  <span id="status-text">Đang khởi tạo...</span>
+</div>
+
+<div id="map"></div>
+
+<div id="controls">
+  <button class="ctrl-btn" onclick="fetchAndPlot()">↻ Tải lại dữ liệu</button>
+  <button class="ctrl-btn" onclick="fitVietnam()">⊞ Về Việt Nam</button>
+  <button class="ctrl-btn" id="dist-mode-btn" onclick="toggleMeasure()">📏 Đo khoảng cách</button>
+</div>
+
+<div id="legend">
+  <h4>Chú giải</h4>
+  <div class="legend-item"><div class="legend-dot red"></div> Điểm tọa độ</div>
+  <div class="legend-item"><div class="legend-dot orange"></div> Điểm đang chọn</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#2563eb;"></div> Điểm đo khoảng cách</div>
+</div>
+
+<!-- Distance result panel -->
+<div id="dist-panel">
+  <h3>Khoảng cách</h3>
+  <div class="dist-value" id="dist-km">–</div>
+  <div class="dist-unit">km (đường chim bay)</div>
+  <div class="dist-names" id="dist-names"></div>
+  <button class="dist-close" onclick="clearMeasure()">✕ Xoá & đo lại</button>
+</div>
+
+<!-- Hint bar -->
+<div class="measure-hint" id="measure-hint">📍 Click điểm A trên bản đồ</div>
+
+<div id="toast"></div>
+
+<script src="map.js"></script>
+</body>
+</html>

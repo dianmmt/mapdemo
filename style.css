@@ -1,0 +1,220 @@
+    
+    @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;500;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f0f4f8;
+      --panel: #ffffff;
+      --border: #d1dce8;
+      --accent: #e63946;
+      --accent2: #2563eb;
+      --text: #1e293b;
+      --muted: #64748b;
+      --shadow: 0 2px 12px rgba(0,0,0,0.10);
+    }
+
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 13px 24px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 1000;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .header-left { display: flex; align-items: center; gap: 12px; }
+
+    .logo-dot {
+      width: 11px; height: 11px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(230,57,70,0.2);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 3px rgba(230,57,70,0.2); }
+      50%      { box-shadow: 0 0 0 6px rgba(230,57,70,0.08); }
+    }
+
+    h1 { font-size: 1rem; font-weight: 700; letter-spacing: 0.02em; color: var(--text); }
+    h1 span { color: var(--accent); }
+
+    .stats { display: flex; gap: 20px; }
+    .stat { text-align: right; }
+    .stat-value { font-size: 1.25rem; font-weight: 700; color: var(--accent2); line-height: 1; }
+    .stat-label { font-size: 0.62rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+    /* ── Status bar ── */
+    #status-bar {
+      padding: 5px 24px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 7px;
+    }
+
+    #status-indicator {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--muted); flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    #status-indicator.loading { background: #f59e0b; animation: pulse2 0.8s infinite; }
+    #status-indicator.ok      { background: #22c55e; }
+    #status-indicator.error   { background: var(--accent); }
+
+    @keyframes pulse2 {
+      0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+    }
+
+    /* ── Map wrapper ── */
+    #map { flex: 1; width: 100%; }
+
+    /* ── Popup styling ── */
+    .leaflet-popup-content-wrapper {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Be Vietnam Pro', sans-serif;
+      font-size: 0.82rem;
+      box-shadow: var(--shadow);
+    }
+    .leaflet-popup-tip { background: var(--panel); }
+    .leaflet-popup-content { margin: 12px 16px; }
+    .popup-title { font-weight: 700; color: var(--accent); margin-bottom: 6px; font-size: 0.92rem; }
+    .popup-row { color: var(--muted); line-height: 1.8; }
+    .popup-row span { color: var(--text); font-weight: 500; }
+
+    /* ── Controls ── */
+    #controls {
+      position: absolute;
+      bottom: 30px; left: 16px;
+      z-index: 999;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .ctrl-btn {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.76rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .ctrl-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ── Legend ── */
+    #legend {
+      position: absolute;
+      bottom: 30px; right: 16px;
+      z-index: 999;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.74rem;
+      box-shadow: var(--shadow);
+    }
+    #legend h4 { color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; font-weight: 600; font-size: 0.65rem; }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; color: var(--text); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .legend-dot.red    { background: #e63946; }
+    .legend-dot.orange { background: #f97316; }
+
+    /* ── Distance tool ── */
+    #dist-mode-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff;
+    }
+    #dist-mode-btn.active:hover {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+
+    #dist-panel {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--panel);
+      border: 1.5px solid #2563eb;
+      border-radius: 14px;
+      padding: 20px 28px;
+      z-index: 1100;
+      box-shadow: 0 8px 32px rgba(37,99,235,0.18);
+      min-width: 260px;
+      text-align: center;
+      display: none;
+      animation: popIn 0.2s ease;
+    }
+    #dist-panel.visible { display: block; }
+
+    @keyframes popIn {
+      from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+      to   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+    }
+
+    #dist-panel h3 { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    #dist-panel .dist-value { font-size: 2rem; font-weight: 700; color: #2563eb; line-height: 1.1; }
+    #dist-panel .dist-unit  { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    #dist-panel .dist-names { font-size: 0.75rem; color: var(--muted); margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; line-height: 1.7; }
+    #dist-panel .dist-names b { color: var(--text); }
+    #dist-panel .dist-close {
+      margin-top: 14px;
+      background: none; border: 1px solid var(--border);
+      color: var(--muted); font-family: inherit; font-size: 0.72rem;
+      padding: 5px 14px; border-radius: 6px; cursor: pointer;
+    }
+    #dist-panel .dist-close:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Cursor hint */
+    #map.measure-mode { cursor: crosshair !important; }
+    .measure-hint {
+      position: absolute;
+      top: 16px; left: 50%; transform: translateX(-50%);
+      background: #2563eb; color: #fff;
+      padding: 7px 18px; border-radius: 20px;
+      font-size: 0.78rem; font-weight: 500;
+      z-index: 1050; pointer-events: none;
+      box-shadow: 0 2px 10px rgba(37,99,235,0.3);
+      display: none;
+    }
+    .measure-hint.visible { display: block; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
+      background: #1e293b; color: #f1f5f9;
+      padding: 10px 22px; border-radius: 20px;
+      font-size: 0.8rem; z-index: 9999;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; }

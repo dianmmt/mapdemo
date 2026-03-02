@@ -2,9 +2,10 @@ import serial
 import json
 import re
 import threading
+from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-
+import serial.tools.list_ports as ls 
 app = Flask(__name__)
 CORS(app)
 
@@ -21,9 +22,18 @@ def extract_json(text):
         return text[start:end+1]
     return None
 
+@app.route('/ports', methods=['GET'])
+def get_ports():
+    ports = []
+    for port in ls.comports():
+        print(port.device)
+        ports.append(port.device)
+    return ports
 
 def read_serial_data():
     global serial_connection, latest_data, stop_reading
+    
+    print("[THREAD] Serial reading thread started")
     
     while not stop_reading and serial_connection and serial_connection.is_open:
         try:
@@ -32,7 +42,7 @@ def read_serial_data():
             if not line:
                 continue
             
-            print(f"Received: {line}")
+            print(f"[RX] {line}")
             
             json_text = extract_json(line)
             if not json_text:
@@ -40,9 +50,26 @@ def read_serial_data():
             
             try:
                 data = json.loads(json_text)
+                data['received_at'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 latest_data = data
-                with open("fullinfo.json", "w", encoding = "utf-8") as f:
-                    json.dump(data, f)
+                
+                # Load existing data
+                try:
+                    with open("db.json", "r", encoding="utf-8") as f:
+                        all_data = json.load(f)
+                    if not isinstance(all_data, list):
+                        all_data = [all_data] if all_data else []
+                except (FileNotFoundError, json.JSONDecodeError):
+                    all_data = []
+                
+                # Append new record
+                all_data.append(data)
+                
+                # Save all records
+                with open("db.json", "w", encoding="utf-8") as f:
+                    json.dump(all_data, f, indent=2, ensure_ascii=False)
+                
+                print(f"Saved to db.json: {data.get('device_type', 'Unknown')} at {data['received_at']} (Total: {len(all_data)} records)")
                 
                     
             except json.JSONDecodeError as e:
@@ -93,6 +120,8 @@ def connect():
         
         read_thread = threading.Thread(target=read_serial_data, daemon=True)
         read_thread.start()
+        
+        print(f"\n[CONNECTED] Serial port {port} @ {baud} baud")
         
         return jsonify({'success': True, 'message': f'Connected to {port} @ {baud} baud'})
         
@@ -148,22 +177,28 @@ def set_config():
 @app.route('/drone-data', methods=['GET'])
 def get_drone_data():
     try:
-        data_list = []
-        with open("fullinfo.json", "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    json_text = extract_json(line)
-                    if json_text:
-                        try:
-                            data_list.append(json.loads(json_text))
-                        except json.JSONDecodeError:
-                            continue
-        return jsonify(data_list)
+        with open("db.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, dict):
+            return jsonify([data])
+        if isinstance(data, list):
+            return jsonify(data)
+        return jsonify([])
     except FileNotFoundError:
-        return jsonify({'error': 'fullinfo.json not found'}), 404
+        return jsonify([])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/clear-data', methods=['POST'])
+def clear_data():
+    try:
+        with open("db.json", "w", encoding="utf-8") as f:
+            json.dump([], f)
+        return jsonify({'success': True, 'message': 'All data cleared'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 
 
 if __name__ == "__main__":

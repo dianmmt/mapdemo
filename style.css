@@ -1694,3 +1694,35 @@ h1 span {
   color: var(--muted-light);
   line-height: 1.6;
 }
+
+/* ══════════════════════════════════════════════
+   RESULT TAB - Terminal Output Style
+══════════════════════════════════════════════ */
+.terminal-output {
+  background: #0d1117;
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  min-height: 200px;
+}
+
+.terminal-line {
+  color: #c9d1d9;
+  word-break: break-all;
+  padding: 2px 0;
+  border-bottom: 1px solid #21262d;
+}
+
+.terminal-line:last-child {
+  border-bottom: none;
+}
+
+.terminal-time {
+  color: #58a6ff;
+}
+
+.terminal-data {
+  color: #7ee787;
+}

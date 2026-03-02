@@ -12,6 +12,21 @@ function expandLeftPanel() {
 }
 
 /* ══════════════════════════════════════════════
+   LEFT PANEL  –  Tab Switching
+══════════════════════════════════════════════ */
+function switchLeftTab(tabName) {
+  // Only select tabs and content within #left-panel
+  const tabs = document.querySelectorAll('#left-panel .sidebar-tab');
+  const contents = document.querySelectorAll('#left-panel .tab-content');
+  
+  tabs.forEach(tab => tab.classList.remove('active'));
+  contents.forEach(content => content.classList.remove('active'));
+  
+  document.getElementById(`left-tab-${tabName}`).classList.add('active');
+  document.getElementById(`left-tab-content-${tabName}`).classList.add('active');
+}
+
+/* ══════════════════════════════════════════════
    LEFT PANEL  –  drag to resize
 ══════════════════════════════════════════════ */
 (function () {
@@ -208,7 +223,7 @@ function getCurrentLocation() {
       latInput.value = lat;
       lngInput.value = lng;
       
-      btn.innerHTML = '<span class="connect-icon">📌</span> GPS tự động';
+      btn.innerHTML = '<span class="connect-icon"></span> GPS tự động';
       btn.disabled = false;
       statusEl.innerHTML = '<div class="status-dot connected"></div><span>' + lat + ', ' + lng + '</span>';
       
@@ -228,7 +243,7 @@ function getCurrentLocation() {
       }
     },
     (error) => {
-      btn.innerHTML = '<span class="connect-icon">📌</span> GPS tự động';
+      btn.innerHTML = '<span class="connect-icon"></span> GPS tự động';
       btn.disabled = false;
       
       let msg = 'Không thể lấy vị trí';
@@ -248,18 +263,41 @@ function getCurrentLocation() {
 }
 
 /* ══════════════════════════════════════════════
-   LEFT PANEL  –  Generate COM ports
+   LEFT PANEL  –  Load Active COM Ports from Backend
 ══════════════════════════════════════════════ */
-(function() {
+async function loadActivePorts() {
   const comSelect = document.getElementById('com-port');
-  for (let i = 1; i <= 100; i++) {
-    const opt = document.createElement('option');
-    opt.value = `COM${i}`;
-    opt.textContent = `COM${i}`;
-    if (i === 7) opt.selected = true;
-    comSelect.appendChild(opt);
+  comSelect.innerHTML = '<option value="">Loading ports...</option>';
+  
+  try {
+    const res = await fetch(`${BACKEND_URL}/ports`);
+    const ports = await res.json();
+    
+    comSelect.innerHTML = '';
+    
+    if (ports.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'Không có cổng COM nào';
+      opt.disabled = true;
+      comSelect.appendChild(opt);
+    } else {
+      ports.forEach((port, index) => {
+        const opt = document.createElement('option');
+        opt.value = port;
+        opt.textContent = port;
+        if (index === 0) opt.selected = true;
+        comSelect.appendChild(opt);
+      });
+    }
+  } catch (err) {
+    console.error('Lỗi khi tải danh sách cổng COM:', err);
+    comSelect.innerHTML = '<option value="">Backend connection error</option>';
   }
-})();
+}
+
+// Tải danh sách ports khi trang load
+document.addEventListener('DOMContentLoaded', loadActivePorts);
 
 /* ══════════════════════════════════════════════
    LEFT PANEL  –  Serial Connection
@@ -286,6 +324,11 @@ async function connectSerial() {
       clearInterval(dataPollingInterval);
       dataPollingInterval = null;
     }
+    if (uavRefreshInterval) {
+      clearInterval(uavRefreshInterval);
+      uavRefreshInterval = null;
+    }
+    lastDeviceType = null;
     showToast('Đã ngắt kết nối');
     return;
   }
@@ -309,6 +352,13 @@ async function connectSerial() {
       statusEl.innerHTML = '<div class="status-dot connected"></div><span>Đã kết nối ' + port + '</span>';
       showToast(`Đã kết nối ${port} @ ${baud} baud`);
       startDataPolling();
+      
+      setTimeout(() => {
+        if (typeof fetchAndPlot === 'function') {
+          fetchAndPlot();
+          showToast('Đang tải danh sách UAV...');
+        }
+      }, 2000);
     } else {
       statusEl.innerHTML = '<div class="status-dot error"></div><span>Lỗi: ' + data.error + '</span>';
       showToast('Lỗi kết nối: ' + data.error);
@@ -320,8 +370,12 @@ async function connectSerial() {
   
   btn.disabled = false;
 }
+let lastDeviceType = null;
+let uavRefreshInterval = null;
+
 function startDataPolling() {
     if (dataPollingInterval) clearInterval(dataPollingInterval);
+    if (uavRefreshInterval) clearInterval(uavRefreshInterval);
     
     dataPollingInterval = setInterval(async () => {
       try {
@@ -329,9 +383,22 @@ function startDataPolling() {
         const data = await res.json();
         if (data && data.freq !== undefined) {
           updateDeviceInfo(data);
+          
+          if (data.device_type && data.device_type !== lastDeviceType) {
+            lastDeviceType = data.device_type;
+            if (typeof fetchAndPlot === 'function') {
+              fetchAndPlot();
+            }
+          }
         }
       } catch (e) {}
     }, 1000);
+    
+    uavRefreshInterval = setInterval(() => {
+      if (isConnected && typeof fetchAndPlot === 'function') {
+        fetchAndPlot();
+      }
+    }, 5000);
   }
   
   function updateDeviceInfo(data) {

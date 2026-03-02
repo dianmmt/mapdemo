@@ -25,7 +25,7 @@ let allData = [];
 let markerMap = {};
 let selectedIndices = new Set();
 
-function fitVietnam() { map.setView([16.5, 107.5], 6); }
+function fitHanoi() { map.setView([21.0285, 105.8542], 10); }
 
 
 function makeDotIcon(color = '#e63946', size = 12) {

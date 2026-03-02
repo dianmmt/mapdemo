@@ -10,6 +10,7 @@ const UAV_KEYS = {
     drone_lon: ['drone_lon'],
     home_lat: ['home_lat'],
     home_lon: ['home_lon'],
+    received_at: ['received_at'],
   };
 
 const ITEMS_PER_PAGE = 10;
@@ -22,14 +23,54 @@ function getField(obj, candidates) {
     return null;
   }
 
+  function formatReceivedTime(dateStr) {
+    if (!dateStr) return '--';
+    try {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffSec = Math.floor(diffMs / 1000);
+        const diffMin = Math.floor(diffSec / 60);
+
+        if (diffSec < 60) return `${diffSec}s trước`;
+        if (diffMin < 60) return `${diffMin}p trước`; 
+        return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    } catch {
+        return dateStr;
+    }
+}
+
 function useDemoData() {
-  const demo = [
-    { device_type: 'DJI Mavic 2 Pro', freq: 5756.5, drone_lat: 16.5, drone_lon: 107.5 },
-    { device_type: 'DJI Phantom 4', freq: 5816.5, drone_lat: 21.0, drone_lon: 105.8 },
-    { device_type: 'DJI Mini 3 Pro', freq: 5776.5, drone_lat: 10.8, drone_lon: 106.6 },
-    { device_type: 'DJI Air 2S', freq: 5836.5, drone_lat: 16.1, drone_lon: 108.2 },
-    { device_type: 'Autel EVO II', freq: 5796.5, drone_lat: 12.2, drone_lon: 109.2 },
-  ];
+    const demo = [
+        // === Dữ liệu gốc (thêm received_at) ===
+        { device_type: 'DJI Mavic 2 Pro', freq: 5756.5, drone_lat: 16.5,  drone_lon: 107.5,  received_at: '2026-02-23T06:00:00Z' },
+        { device_type: 'DJI Phantom 4',   freq: 5816.5, drone_lat: 21.0,  drone_lon: 105.8,  received_at: '2026-02-23T06:05:00Z' },
+        { device_type: 'DJI Mini 3 Pro',  freq: 5776.5, drone_lat: 10.8,  drone_lon: 106.6,  received_at: '2026-02-23T06:10:00Z' },
+        { device_type: 'DJI Air 2S',      freq: 5836.5, drone_lat: 16.1,  drone_lon: 108.2,  received_at: '2026-02-23T06:15:00Z' },
+        { device_type: 'Autel EVO II',    freq: 5796.5, drone_lat: 12.2,  drone_lon: 109.2,  received_at: '2026-02-23T06:20:00Z' },
+      
+        // === 5 thiết bị trong vòng 20km từ 21.024656, 105.773893 ===
+      
+        // DJI Mavic 2 Pro — ~8.2km Đông Bắc (21.0719, 105.8521)
+        { device_type: 'DJI Mavic 2 Pro', freq: 5756.5, drone_lat: 21.0720, drone_lon: 105.8520, received_at: '2026-02-23T08:14:22Z' },
+        { device_type: 'DJI Mavic 2 Pro', freq: 5756.5, drone_lat: 21.0718, drone_lon: 105.8522, received_at: '2026-02-24T09:30:11Z' },
+        { device_type: 'DJI Mavic 2 Pro', freq: 5756.5, drone_lat: 21.0715, drone_lon: 105.8519, received_at: '2026-02-25T07:45:33Z' },
+        { device_type: 'DJI Mavic 2 Pro', freq: 5756.5, drone_lat: 21.0721, drone_lon: 105.8523, received_at: '2026-02-26T10:12:05Z' },
+        { device_type: 'DJI Mavic 2 Pro', freq: 5756.5, drone_lat: 21.0719, drone_lon: 105.8521, received_at: '2026-02-27T14:55:47Z' },
+        { device_type: 'DJI Mavic 2 Pro', freq: 5756.5, drone_lat: 21.0722, drone_lon: 105.8518, received_at: '2026-02-28T08:22:19Z' },
+        { device_type: 'DJI Mavic 2 Pro', freq: 5756.5, drone_lat: 21.0717, drone_lon: 105.8524, received_at: '2026-03-01T09:10:44Z' },
+      
+        // DJI Phantom 4 — ~15.3km Đông Nam (20.9381, 105.8891)
+        { device_type: 'DJI Phantom 4', freq: 5816.5, drone_lat: 20.9380, drone_lon: 105.8890, received_at: '2026-02-23T11:05:38Z' },
+        { device_type: 'DJI Phantom 4', freq: 5816.5, drone_lat: 20.9382, drone_lon: 105.8892, received_at: '2026-02-24T13:44:22Z' },
+        { device_type: 'DJI Phantom 4', freq: 5816.5, drone_lat: 20.9379, drone_lon: 105.8888, received_at: '2026-02-25T16:30:09Z' },
+        { device_type: 'DJI Phantom 4', freq: 5816.5, drone_lat: 20.9381, drone_lon: 105.8891, received_at: '2026-02-26T08:55:17Z' },
+        { device_type: 'DJI Phantom 4', freq: 5816.5, drone_lat: 20.9383, drone_lon: 105.8893, received_at: '2026-02-27T11:20:33Z' },
+        { device_type: 'DJI Phantom 4', freq: 5816.5, drone_lat: 20.9378, drone_lon: 105.8887, received_at: '2026-02-28T15:45:58Z' },
+        { device_type: 'DJI Phantom 4', freq: 5816.5, drone_lat: 20.9380, drone_lon: 105.8890, received_at: '2026-03-01T10:30:12Z' },
+      
+       
+      ];
   displayUAVData(demo);
   setStatus('error', 'Đang dùng dữ liệu demo.');
   showToast('Đang dùng dữ liệu demo');
@@ -118,6 +159,7 @@ function renderSidebar() {
     const freq = getField(item, UAV_KEYS.freq);
     const lat = getField(item, ['drone_lat', 'lat', 'latitude']);
     const lng = getField(item, ['drone_lon', 'lon', 'lng', 'longitude']);
+    const receivedAt = getField(item, UAV_KEYS.received_at);
     const hasCoords = lat !== null && lng !== null && (lat !== 0 || lng !== 0);
 
     const card = document.createElement('div');
@@ -129,7 +171,11 @@ function renderSidebar() {
       <div class="point-card-dot"></div>
       <div class="point-card-body">
         <div class="point-card-name">${deviceType}</div>
-        <div class="point-card-coords">${freq ? freq.toFixed(3) + ' MHz' : '--'}</div>
+        <div class="point-card-meta">
+          <span class="point-card-freq">${freq ? freq.toFixed(3) + ' MHz' : '--'}</span>
+          <span class="point-card-divider">•</span>
+          <span class="point-card-time" title="${receivedAt || ''}">${formatReceivedTime(receivedAt)}</span>
+        </div>
       </div>
     `;
 
@@ -150,7 +196,7 @@ function renderSidebar() {
   
   const sidebarCountEl = document.getElementById('sidebar-count');
   if (sidebarCountEl) sidebarCountEl.textContent = allData.length;
-  
+
   const totalCountEl = document.getElementById('total-count');
   if (totalCountEl) totalCountEl.textContent = allData.length;
   
@@ -314,193 +360,3 @@ async function fetchAndPlot() {
 fetchAndPlot();
 setInterval(fetchAndPlot, 60_000);
 
-// ══════════════════════════════════════════════
-// TAB SWITCHING & LOCATION TAB
-// ══════════════════════════════════════════════
-let currentTab = 'all';
-const LOCATION_RADIUS_KM = 20;
-
-function switchTab(tabName) {
-  currentTab = tabName;
-  
-  document.querySelectorAll('.sidebar-tab').forEach(tab => {
-    tab.classList.remove('active');
-  });
-  document.getElementById(`tab-${tabName}`).classList.add('active');
-  
-  document.querySelectorAll('.tab-content').forEach(content => {
-    content.classList.remove('active');
-  });
-  document.getElementById(`tab-content-${tabName}`).classList.add('active');
-  
-  if (tabName === 'location') {
-    renderLocationList();
-  }
-}
-
-function getCurrentPosition() {
-  const latInput = document.getElementById('lat');
-  const lngInput = document.getElementById('lng');
-  
-  if (!latInput || !lngInput) return null;
-  
-  const lat = parseFloat(latInput.value);
-  const lng = parseFloat(lngInput.value);
-  
-  if (isNaN(lat) || isNaN(lng)) return null;
-  
-  return { lat, lng };
-}
-
-function calculateDistance(lat1, lng1, lat2, lng2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 +
-            Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-function renderLocationList() {
-  const listEl = document.getElementById('location-list');
-  const countEl = document.getElementById('location-count');
-  const posDisplayEl = document.getElementById('current-pos-display');
-  
-  if (!listEl) return;
-  
-  const currentPos = getCurrentPosition();
-  
-  if (!currentPos) {
-    listEl.innerHTML = `
-      <div class="point-list-empty">
-        <div class="empty-icon">📍</div>
-        Chưa xác định vị trí hiện tại.<br>Vui lòng nhập tọa độ ở panel bên trái.
-      </div>
-    `;
-    if (countEl) countEl.textContent = '0';
-    if (posDisplayEl) {
-      posDisplayEl.textContent = 'Chưa xác định vị trí';
-      posDisplayEl.classList.remove('active');
-    }
-    return;
-  }
-  
-  if (posDisplayEl) {
-    posDisplayEl.textContent = `${currentPos.lat.toFixed(6)}, ${currentPos.lng.toFixed(6)}`;
-    posDisplayEl.classList.add('active');
-  }
-  
-  const uavsWithDistance = [];
-  
-  allData.forEach((item, idx) => {
-    const lat = getField(item, ['drone_lat', 'lat', 'latitude']);
-    const lng = getField(item, ['drone_lon', 'lon', 'lng', 'longitude']);
-    
-    if (lat !== null && lng !== null && (lat !== 0 || lng !== 0)) {
-      const distance = calculateDistance(currentPos.lat, currentPos.lng, lat, lng);
-      
-      if (distance <= LOCATION_RADIUS_KM) {
-        uavsWithDistance.push({
-          item,
-          idx,
-          distance,
-          lat,
-          lng
-        });
-      }
-    }
-  });
-  
-  uavsWithDistance.sort((a, b) => a.distance - b.distance);
-  
-  if (countEl) countEl.textContent = uavsWithDistance.length;
-  
-  if (uavsWithDistance.length === 0) {
-    listEl.innerHTML = `
-      <div class="location-no-results">
-        <div class="no-result-icon">🔍</div>
-        <div class="no-result-title">Không tìm thấy UAV</div>
-        <div class="no-result-desc">
-          Không có UAV nào trong phạm vi ${LOCATION_RADIUS_KM}km<br>
-          từ vị trí hiện tại của bạn.
-        </div>
-      </div>
-    `;
-    return;
-  }
-  
-  listEl.innerHTML = '';
-  
-  uavsWithDistance.forEach(({ item, idx, distance, lat, lng }) => {
-    const deviceType = getField(item, UAV_KEYS.device_type) || `UAV #${idx + 1}`;
-    const freq = getField(item, UAV_KEYS.freq);
-    
-    let distanceClass = 'close';
-    if (distance < 5) distanceClass = 'very-close';
-    else if (distance > 15) distanceClass = 'medium';
-    
-    let distanceDisplay, distanceUnit;
-    if (distance < 1) {
-      distanceDisplay = (distance * 1000).toFixed(0);
-      distanceUnit = 'm';
-    } else {
-      distanceDisplay = distance.toFixed(2);
-      distanceUnit = 'km';
-    }
-    
-    const card = document.createElement('div');
-    card.className = `location-card ${distanceClass}`;
-    card.dataset.idx = idx;
-    
-    card.innerHTML = `
-      <div class="location-card-icon">
-        <span>🛸</span>
-      </div>
-      <div class="location-card-body">
-        <div class="location-card-name">${deviceType}</div>
-        <div class="location-card-freq">${freq ? freq.toFixed(3) + ' MHz' : 'N/A'}</div>
-      </div>
-      <div class="location-card-distance">
-        <div class="distance-value">${distanceDisplay}</div>
-        <div class="distance-unit">${distanceUnit}</div>
-      </div>
-    `;
-    
-    card.addEventListener('click', () => {
-      if (markerMap[idx]) {
-        map.flyTo([lat, lng], 14, { duration: 0.8 });
-        markerMap[idx].openPopup();
-      }
-    });
-    
-    listEl.appendChild(card);
-  });
-}
-
-function updateLocationTabOnPositionChange() {
-  if (currentTab === 'location') {
-    renderLocationList();
-  }
-  const countEl = document.getElementById('location-count');
-  if (countEl) {
-    const currentPos = getCurrentPosition();
-    if (currentPos && allData.length > 0) {
-      let count = 0;
-      allData.forEach((item) => {
-        const lat = getField(item, ['drone_lat', 'lat', 'latitude']);
-        const lng = getField(item, ['drone_lon', 'lon', 'lng', 'longitude']);
-        if (lat !== null && lng !== null && (lat !== 0 || lng !== 0)) {
-          const distance = calculateDistance(currentPos.lat, currentPos.lng, lat, lng);
-          if (distance <= LOCATION_RADIUS_KM) count++;
-        }
-      });
-      countEl.textContent = count;
-    }
-  }
-}
-
-const originalDisplayUAVData = displayUAVData;
-displayUAVData = function(data) {
-  originalDisplayUAVData(data);
-  setTimeout(updateLocationTabOnPositionChange, 100);
-};

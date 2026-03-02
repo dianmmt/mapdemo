@@ -257,97 +257,73 @@ h1 span {
   overflow: hidden;
   min-width: 260px;
 }
+
 #left-panel.collapsed .left-panel-inner {
   visibility: hidden;
   opacity: 0;
 }
 
-.left-panel-header {
-  padding: 16px 16px 14px;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-  flex-shrink: 0;
-  background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
-  position: relative;
+/* Left panel specific tab content */
+#left-panel .tab-content {
+  display: none;
+  flex-direction: column;
+  flex: 1;
   overflow: hidden;
 }
-.left-panel-header::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 100%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
-  pointer-events: none;
+
+#left-panel .tab-content.active {
+  display: flex;
+}
+
+.left-panel-header {
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--panel);
 }
 
 .left-panel-top-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  position: relative;
+  margin-bottom: 9px;
+  gap: 6px;
 }
 
-.left-panel-title {
+.panel-header {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 7px;
+  position: relative;
+  left: 35px;
 }
 
-.config-icon {
-  font-size: 1.6rem;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-.title-text {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.title-main {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: 0.02em;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-
-.title-sub {
-  font-size: 0.65rem;
-  font-weight: 500;
-  color: rgba(255,255,255,0.6);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
+.left-panel-header .sidebar-tabs {
+  margin-top: 0;
 }
 
 #left-panel-toggle {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px;
-  width: 32px; height: 32px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 26px; height: 26px;
   cursor: pointer;
-  color: rgba(255,255,255,0.8);
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
-  transition: all 0.2s ease;
+  font-size: 0.72rem;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
   flex-shrink: 0;
-  backdrop-filter: blur(4px);
 }
 #left-panel-toggle:hover {
-  background: rgba(255,255,255,0.2);
-  border-color: rgba(255,255,255,0.4);
+  background: var(--accent2);
+  border-color: var(--accent2);
   color: #fff;
-  transform: scale(1.05);
 }
 
 .left-panel-body {
@@ -364,6 +340,27 @@ h1 span {
 }
 .left-panel-body::-webkit-scrollbar-thumb:hover { 
   background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%); 
+}
+
+/* Result list styling */
+#result-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#result-list .point-list-empty {
+  text-align: center;
+  color: var(--muted-light);
+  font-size: 0.76rem;
+  padding: 40px 16px;
+  line-height: 2;
+}
+
+#result-list .point-list-empty .empty-icon {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  opacity: 0.45;
 }
 
 .config-section {
@@ -496,9 +493,7 @@ h1 span {
   transform: none;
 }
 
-.connect-icon {
-  font-size: 1rem;
-}
+
 
 .info-row {
   display: flex;
@@ -1190,6 +1185,31 @@ h1 span {
   white-space: nowrap;
 }
 
+/* Meta row: frequency + time */
+.point-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  color: var(--muted-light);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.point-card-freq {
+  color: var(--muted-light);
+}
+.point-card-divider {
+  color: var(--border);
+  font-size: 0.5rem;
+}
+.point-card-time {
+  color: #16a34a;
+  font-weight: 500;
+}
+.point-card.selected .point-card-time {
+  color: #1d4ed8;
+}
+
 /* Empty state */
 .point-list-empty {
   text-align: center;
@@ -1476,6 +1496,9 @@ h1 span {
   border-radius: 10px;
   min-width: 18px;
   text-align: center;
+  padding-left : 4px;
+  position: relative;
+  left: 4px;
 }
 
 .sidebar-tab:not(.active) .tab-badge {
@@ -1601,6 +1624,12 @@ h1 span {
 .location-card-freq {
   font-size: 0.65rem;
   color: var(--muted-light);
+}
+.location-card-time {
+  font-size: 0.6rem;
+  color: #16a34a;
+  margin-top: 2px;
+  font-weight: 500;
 }
 
 .location-card-distance {

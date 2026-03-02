@@ -42,90 +42,107 @@
       <!-- Header -->
       <div class="left-panel-header">
         <div class="left-panel-top-row">
-          <div class="left-panel-title">
-            <span class="config-icon"></span>
-            <div class="title-text">
-              <span class="title-main">Drone Monitor</span>
-              <span class="title-sub">Configuration Panel</span>
-            </div>
+          <div class="panel-header">
+            Drone Monitor
           </div>
           <button id="left-panel-toggle" onclick="collapseLeftPanel()" title="Thu nhỏ">❮</button>
         </div>
+        
+        <!-- Tab buttons -->
+        <div class="sidebar-tabs">
+          <button class="sidebar-tab active" id="left-tab-config" onclick="switchLeftTab('config')">
+             Config
+          </button>
+          <button class="sidebar-tab" id="left-tab-result" onclick="switchLeftTab('result')">
+             Result <span class="tab-badge" id="result-count">0</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Configuration Form -->
-      <div class="left-panel-body">
-        <!-- Current Location Section -->
-        <div class="config-section section-serial">
-          <div class="section-title">Vị trí hiện tại</div>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="lat">Vĩ độ (Lat)</label>
-              <input type="text" id="lat" class="input-coord" placeholder="10.776900" onchange="onCoordInputChange()">
+      <!-- Tab: Configuration -->
+      <div id="left-tab-content-config" class="tab-content active">
+        <div class="left-panel-body">
+          <!-- Current Location Section -->
+          <div class="config-section section-serial">
+            <div class="section-title">Vị trí hiện tại</div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="lat">Vĩ độ (Lat)</label>
+                <input type="text" id="lat" class="input-coord" placeholder="10.776900" onchange="onCoordInputChange()">
+              </div>
+              
+              <div class="form-group">
+                <label for="lng">Kinh độ (Lng)</label>
+                <input type="text" id="lng" class="input-coord" placeholder="106.690000" onchange="onCoordInputChange()">
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-connect" id="btn-goto" onclick="goToLocation()">
+                 Đi đến vị trí
+              </button>
+              <button class="btn-connect" id="btn-locate" onclick="getCurrentLocation()">
+              GPS tự động
+              </button>
             </div>
             
-            <div class="form-group">
-              <label for="lng">Kinh độ (Lng)</label>
-              <input type="text" id="lng" class="input-coord" placeholder="106.690000" onchange="onCoordInputChange()">
+            <!-- Location Status -->
+            <div class="connection-status" id="location-status">
+              <div class="status-dot disconnected"></div>
+              <span>Chưa xác định vị trí</span>
             </div>
           </div>
 
-          <div class="btn-row">
-            <button class="btn-connect " id="btn-goto" onclick="goToLocation()">
-              <span class="connect-icon"></span> Đi đến vị trí
-            </button>
-            <button class="btn-connect" id="btn-locate" onclick="getCurrentLocation()">
-              <span class="connect-icon"></span> GPS tự động
-            </button>
-          </div>
-          
-          <!-- Location Status -->
-          <div class="connection-status" id="location-status">
-            <div class="status-dot disconnected"></div>
-            <span>Chưa xác định vị trí</span>
-          </div>
-        </div>
-
-        <!-- Serial Connection Section -->
-        <div class="config-section section-serial">
-          <div class="section-title"> Kết nối Serial</div>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="com-port">Cổng COM</label>
-              <select id="com-port">
-                
-              </select>
+          <!-- Serial Connection Section -->
+          <div class="config-section section-serial">
+            <div class="section-title">Kết nối Serial</div>
+            <button onclick="loadActivePorts()" title="Làm mới danh sách cổng COM"></button>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="com-port">Cổng COM</label>
+                <select id="com-port">
+                  
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="baud-rate">Baud Rate</label>
+                <select id="baud-rate">
+                  <option value="600">600</option>
+                  <option value="1200">1200</option>
+                  <option value="2400">2400</option>
+                  <option value="4800">4800</option>
+                  <option value="9600">9600</option>
+                  <option value="19200">19200</option>
+                  <option value="38400">38400</option>
+                  <option value="57600">57600</option>
+                  <option value="115200" selected>115200</option>
+                </select>
+              </div>
             </div>
+
+            <button class="btn-connect" id="btn-connect" onclick="connectSerial()">
+             Kết nối thiết bị
+            </button>
             
-            <div class="form-group">
-              <label for="baud-rate">Baud Rate</label>
-              <select id="baud-rate">
-                <option value="600">600</option>
-                <option value="1200">1200</option>
-                <option value="2400">2400</option>
-                <option value="4800">4800</option>
-                <option value="9600">9600</option>
-                <option value="19200">19200</option>
-                <option value="38400">38400</option>
-                <option value="57600">57600</option>
-                <option value="115200" selected>115200</option>
-              </select>
+            <!-- Connection Status -->
+            <div class="connection-status" id="connection-status">
+              <div class="status-dot disconnected"></div>
+              <span>Chưa kết nối</span>
             </div>
           </div>
+        </div>
+      </div>
 
-          <button class="btn-connect" id="btn-connect" onclick="connectSerial()">
-            <span class="connect-icon"></span> Kết nối thiết bị
-          </button>
-          
-          <!-- Connection Status -->
-          <div class="connection-status" id="connection-status">
-            <div class="status-dot disconnected"></div>
-            <span>Chưa kết nối</span>
+      <!-- Tab: Result -->
+      <div id="left-tab-content-result" class="tab-content">
+        <div id="result-list" class="left-panel-body">
+          <div class="point-list-empty">
+            <div class="empty-icon"></div>
+            Chưa có kết quả.<br>Kết nối thiết bị để nhận dữ liệu.
           </div>
         </div>
-        
       </div>
     </div>
   </aside>
@@ -147,8 +164,8 @@
       <!-- Header -->
       <div class="sidebar-header">
         <div class="sidebar-top-row">
-          <div class="sidebar-title">
-            Danh sách UAV <span id="sidebar-count">0</span>
+          <div class="panel-header">
+            Danh sách UAV 
           </div>
           <!-- Collapse button -->
           <button id="sidebar-toggle" onclick="collapseSidebar()" title="Thu nhỏ">❯</button>
@@ -157,10 +174,10 @@
         <!-- Tab buttons -->
         <div class="sidebar-tabs">
           <button class="sidebar-tab active" id="tab-all" onclick="switchTab('all')">
-            <span class="tab-icon-btn">📋</span> Tất cả
+            <span class="tab-icon-btn"></span> List <span class="tab-badge" id="sidebar-count">0</span>
           </button>
           <button class="sidebar-tab" id="tab-location" onclick="switchTab('location')">
-            <span class="tab-icon-btn">📍</span> Location <span class="tab-badge" id="location-count">0</span>
+            <span class="tab-icon-btn"></span> Location <span class="tab-badge" id="location-count">0</span>
           </button>
         </div>
       </div>
@@ -168,7 +185,7 @@
       <!-- Tab: All UAVs -->
       <div id="tab-content-all" class="tab-content active">
         <div class="tab-search-bar">
-          <input id="search-box" type="text" placeholder="🔍  Tìm kiếm điểm..." autocomplete="off" />
+          <input id="search-box" type="text" placeholder="  Tìm kiếm điểm..." autocomplete="off" />
         </div>
         
         <!-- Selection bar -->
@@ -183,25 +200,25 @@
         <!-- Point list (cards injected by map.js) -->
         <div id="point-list">
           <div class="point-list-empty">
-            <div class="empty-icon">📍</div>
+            <div class="empty-icon"></div>
             Chưa có dữ liệu.<br>Nhấn <strong>Tải lại dữ liệu</strong> để bắt đầu.
           </div>
         </div>
       </div>
 
-      <!-- Tab: Location (UAVs within 20km) -->
+     
       <div id="tab-content-location" class="tab-content">
-        <div class="location-tab-header">
+        <!-- <div class="location-tab-header">
           <div class="location-info">
             <span class="location-label">UAV trong phạm vi 20km</span>
             <span class="location-current" id="current-pos-display">Chưa xác định vị trí</span>
           </div>
-        </div>
+        </div> -->
         
         <div id="location-list">
           <div class="point-list-empty">
-            <div class="empty-icon">📍</div>
-            Chưa xác định vị trí hiện tại.<br>Vui lòng nhập tọa độ ở panel bên trái.
+            <div class="empty-icon"></div>
+            Chưa xác định vị trí hiện tại.
           </div>
         </div>
       </div>
@@ -221,9 +238,9 @@
     <span class="ctrl-icon">↻</span>
     <span class="ctrl-text">Tải lại</span>
   </button>
-  <button class="ctrl-btn" onclick="fitVietnam()" title="Về Việt Nam">
+  <button class="ctrl-btn" onclick="fitHanoi()" title="Về Hà Nội">
     <img class="ctrl-icon ctrl-img" src="./images/vietnam.png" alt="VN">
-    <span class="ctrl-text">Việt Nam</span>
+    <span class="ctrl-text">Hà Nội</span>
   </button>
   <button class="ctrl-btn" id="dist-mode-btn" onclick="toggleMeasure()" title="Đo">
     <span class="ctrl-icon">📏</span>
@@ -349,12 +366,11 @@ leftPanel.addEventListener('transitionend', () => {
   document.addEventListener('touchend', () => { dragging = false; });
 })();
 
-
 </script>
 
 <script src="map.js"></script>
 <script src = "firstConfig.js"></script>
 <script src = "uavlist.js"></script>
-
+<script src = "location.js"></script>
 </body>
 </html>

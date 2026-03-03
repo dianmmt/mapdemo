@@ -13,7 +13,7 @@
 <header>
   <div class="header-left">
     <div class="logo-dot"></div>
-    <h1>Hehee</h1>
+    <h1>UAV map</h1>
   </div>
   <div class="stats">
     <div class="stat">
@@ -97,13 +97,20 @@
           <!-- Serial Connection Section -->
           <div class="config-section section-serial">
             <div class="section-title">Kết nối Serial</div>
-            <button onclick="loadActivePorts()" title="Làm mới danh sách cổng COM"></button>
             <div class="form-row">
               <div class="form-group">
                 <label for="com-port">Cổng COM</label>
-                <select id="com-port">
-                  
-                </select>
+                <div class="com-port-wrapper">
+                  <select id="com-port">
+                    
+                  </select>
+                  <button class="btn-refresh-ports" onclick="loadActivePorts(true)" title="Làm mới danh sách cổng COM">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+                      <path d="M21 3v5h-5"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
               
               <div class="form-group">
@@ -372,5 +379,6 @@ leftPanel.addEventListener('transitionend', () => {
 <script src = "firstConfig.js"></script>
 <script src = "uavlist.js"></script>
 <script src = "location.js"></script>
+<script src = "showResult.js"></script>
 </body>
 </html>

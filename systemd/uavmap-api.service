@@ -1,0 +1,23 @@
+[Unit]
+Description=UAVmap API Backend Service (Flask)
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/uavmap/backend
+Environment="PATH=/opt/uavmap/venv/bin"
+ExecStart=/opt/uavmap/venv/bin/python readingdata.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Security settings
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/uavmap/backend
+
+[Install]
+WantedBy=multi-user.target

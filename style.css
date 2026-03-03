@@ -439,6 +439,56 @@ h1 span {
   background: #ffffff;
 }
 
+.com-port-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.com-port-wrapper select {
+  flex: 1;
+}
+
+.btn-refresh-ports {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.btn-refresh-ports svg {
+  transition: transform 0.3s ease;
+}
+
+.btn-refresh-ports:hover {
+  border-color: #3b82f6;
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  color: #3b82f6;
+}
+
+.btn-refresh-ports:hover svg {
+  transform: rotate(180deg);
+}
+
+.btn-refresh-ports:active {
+  transform: scale(0.95);
+  background: #dbeafe;
+}
+
+.btn-refresh-ports:active svg {
+  transform: rotate(360deg);
+}
+
 .btn-connect {
   width: 100%;
   padding: 12px 18px;
@@ -1594,16 +1644,24 @@ h1 span {
 .location-card-icon {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-radius: 8px;
+  background: #f8fafc;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
 }
 
 .location-card-icon span {
   font-size: 1rem;
+}
+
+.uav-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .location-card-body {
@@ -1655,18 +1713,21 @@ h1 span {
   color: #16a34a;
 }
 .location-card.very-close .location-card-icon {
-  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-color: #22c55e;
 }
 
 .location-card.close .distance-value {
   color: #2563eb;
+}
+.location-card.close .location-card-icon {
+  border-color: #3b82f6;
 }
 
 .location-card.medium .distance-value {
   color: #f59e0b;
 }
 .location-card.medium .location-card-icon {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
 }
 
 /* No results message */
@@ -1699,20 +1760,21 @@ h1 span {
    RESULT TAB - Terminal Output Style
 ══════════════════════════════════════════════ */
 .terminal-output {
-  background: #0d1117;
+  background: #ffffff;
   border-radius: 8px;
   padding: 12px;
   font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
   font-size: 0.72rem;
   line-height: 1.6;
   min-height: 200px;
+  border: 1px solid #e5e7eb;
 }
 
 .terminal-line {
-  color: #c9d1d9;
+  color: #1f2937;
   word-break: break-all;
   padding: 2px 0;
-  border-bottom: 1px solid #21262d;
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .terminal-line:last-child {
@@ -1720,9 +1782,9 @@ h1 span {
 }
 
 .terminal-time {
-  color: #58a6ff;
+  color: #2563eb;
 }
 
 .terminal-data {
-  color: #7ee787;
+  color: #111827;
 }

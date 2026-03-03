@@ -56,7 +56,6 @@ function renderLocationList() {
   if (!currentPos) {
     listEl.innerHTML = `
       <div class="point-list-empty">
-        <div class="empty-icon">📍</div>
         Chưa xác định vị trí hiện tại.<br>Vui lòng nhập tọa độ ở panel bên trái.
       </div>
     `;
@@ -138,12 +137,12 @@ function renderLocationList() {
     
     card.innerHTML = `
       <div class="location-card-icon">
-        <span>🛸</span>
+        <img src="images/djimavic2.jpg" alt="UAV" class="uav-icon">
       </div>
       <div class="location-card-body">
         <div class="location-card-name">${deviceType}</div>
         <div class="location-card-freq">${freq ? freq.toFixed(3) + ' MHz' : 'N/A'}</div>
-        <div class="location-card-time">🕐 ${formatReceivedTime(receivedAt)}</div>
+        <div class="location-card-time">Time: ${formatReceivedTime(receivedAt)}</div>
       </div>
       <div class="location-card-distance">
         <div class="distance-value">${distanceDisplay}</div>

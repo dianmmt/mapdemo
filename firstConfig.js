@@ -122,7 +122,7 @@ function updateCurrentLocationMarker(lat, lng) {
       zIndexOffset: 1000
     })
     .bindPopup(`
-      <div class="popup-title">📍 Vị trí hiện tại</div>
+      <div class="popup-title">Vị trí hiện tại</div>
       <div class="popup-row">Vĩ độ: <span>${latNum.toFixed(6)}</span></div>
       <div class="popup-row">Kinh độ: <span>${lngNum.toFixed(6)}</span></div>
     `)
@@ -130,7 +130,7 @@ function updateCurrentLocationMarker(lat, lng) {
   }
   
   currentLocationMarker.setPopupContent(`
-    <div class="popup-title">📍 Vị trí hiện tại</div>
+    <div class="popup-title">Vị trí hiện tại</div>
     <div class="popup-row">Vĩ độ: <span>${latNum.toFixed(6)}</span></div>
     <div class="popup-row">Kinh độ: <span>${lngNum.toFixed(6)}</span></div>
   `);
@@ -211,7 +211,7 @@ function getCurrentLocation() {
     return;
   }
   
-  btn.innerHTML = '<span class="connect-icon">⏳</span> Đang lấy...';
+  btn.innerHTML = ' Đang lấy...';
   btn.disabled = true;
   statusEl.innerHTML = '<div class="status-dot" style="background:#f59e0b;animation:blink 0.8s infinite"></div><span>Đang xác định...</span>';
   
@@ -236,7 +236,7 @@ function getCurrentLocation() {
       showToast(`Vị trí: ${lat}, ${lng}`);
       
       if (window.map) {
-        map.flyTo([parseFloat(lat), parseFloat(lng)], 15, { duration: 1.5 });
+        map.flyTo([parseFloat(lat), parseFloat(lng)],10, { duration: 1.5 });
         setTimeout(() => {
           if (currentLocationMarker) currentLocationMarker.openPopup();
         }, 1600);
@@ -265,9 +265,16 @@ function getCurrentLocation() {
 /* ══════════════════════════════════════════════
    LEFT PANEL  –  Load Active COM Ports from Backend
 ══════════════════════════════════════════════ */
-async function loadActivePorts() {
+async function loadActivePorts(showFeedback = false) {
   const comSelect = document.getElementById('com-port');
-  comSelect.innerHTML = '<option value="">Loading ports...</option>';
+  const refreshBtn = document.querySelector('.btn-refresh-ports');
+  
+  comSelect.innerHTML = '<option value="">Đang tải...</option>';
+  
+  if (refreshBtn) {
+    refreshBtn.disabled = true;
+    refreshBtn.style.opacity = '0.6';
+  }
   
   try {
     const res = await fetch(`${BACKEND_URL}/ports`);
@@ -281,6 +288,9 @@ async function loadActivePorts() {
       opt.textContent = 'Không có cổng COM nào';
       opt.disabled = true;
       comSelect.appendChild(opt);
+      if (showFeedback && typeof showToast === 'function') {
+        showToast('Không tìm thấy cổng COM nào');
+      }
     } else {
       ports.forEach((port, index) => {
         const opt = document.createElement('option');
@@ -289,10 +299,21 @@ async function loadActivePorts() {
         if (index === 0) opt.selected = true;
         comSelect.appendChild(opt);
       });
+      if (showFeedback && typeof showToast === 'function') {
+        showToast(`Đã tìm thấy ${ports.length} cổng COM`);
+      }
     }
   } catch (err) {
     console.error('Lỗi khi tải danh sách cổng COM:', err);
-    comSelect.innerHTML = '<option value="">Backend connection error</option>';
+    comSelect.innerHTML = '<option value="">Lỗi kết nối backend</option>';
+    if (showFeedback && typeof showToast === 'function') {
+      showToast('Không thể kết nối tới backend');
+    }
+  } finally {
+    if (refreshBtn) {
+      refreshBtn.disabled = false;
+      refreshBtn.style.opacity = '1';
+    }
   }
 }
 
@@ -328,12 +349,16 @@ async function connectSerial() {
       clearInterval(uavRefreshInterval);
       uavRefreshInterval = null;
     }
+    // Stop result tab polling
+    if (typeof stopResultPolling === 'function') {
+      stopResultPolling();
+    }
     lastDeviceType = null;
     showToast('Đã ngắt kết nối');
     return;
   }
   
-  btn.innerHTML = '<span class="connect-icon">⏳</span> Đang kết nối...';
+  btn.innerHTML = ' Đang kết nối...';
   btn.disabled = true;
   
   try {
@@ -347,11 +372,16 @@ async function connectSerial() {
     
     if (data.success) {
       isConnected = true;
-      btn.innerHTML = '<span class="connect-icon">🔴</span> Ngắt kết nối';
+      btn.innerHTML = 'Ngắt kết nối';
       btn.classList.add('connected');
       statusEl.innerHTML = '<div class="status-dot connected"></div><span>Đã kết nối ' + port + '</span>';
       showToast(`Đã kết nối ${port} @ ${baud} baud`);
       startDataPolling();
+      
+      // Start result tab polling
+      if (typeof startResultPolling === 'function') {
+        startResultPolling();
+      }
       
       setTimeout(() => {
         if (typeof fetchAndPlot === 'function') {

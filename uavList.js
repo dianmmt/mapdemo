@@ -358,5 +358,4 @@ async function fetchAndPlot() {
   }
 
 fetchAndPlot();
-setInterval(fetchAndPlot, 60_000);
 

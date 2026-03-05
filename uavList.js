@@ -98,11 +98,11 @@ function displayUAVData(data) {
     const deviceType = getField(item, UAV_KEYS.device_type);
 
     if (lat !== null && lng !== null && (lat !== 0 || lng !== 0)) {
-      // Chỉ hiện UAV trong bán kính 20km nếu có vị trí hiện tại
+      
       if (currentPost) {
         const distance = calculateDistance(currentPost.lat, currentPost.lng, lat, lng);
         if (distance > LOCATION_RADIUS_KM) {
-          return; // Bỏ qua UAV ngoài 20km
+          return; 
         }
       }
       

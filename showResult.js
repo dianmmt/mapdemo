@@ -1,6 +1,4 @@
-/* ══════════════════════════════════════════════
-   RESULT TAB - Hiển thị dữ liệu thô dạng terminal
-══════════════════════════════════════════════ */
+
 
 let resultPollingInterval = null;
 

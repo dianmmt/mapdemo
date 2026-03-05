@@ -1,5 +1,5 @@
 [Unit]
-Description=UAVmap API Backend Service (Flask)
+Description=Map Backend API Service (Flask)
 After=network.target
 
 [Service]

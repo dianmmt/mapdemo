@@ -16,16 +16,16 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 echo "[1/4] Stopping services..."
-systemctl stop uavmap-api.service 2>/dev/null || true
-systemctl stop uavmap-frontend.service 2>/dev/null || true
+systemctl stop map-backend.service 2>/dev/null || true
+systemctl stop map-frontend.service 2>/dev/null || true
 
 echo "[2/4] Disabling services..."
-systemctl disable uavmap-api.service 2>/dev/null || true
-systemctl disable uavmap-frontend.service 2>/dev/null || true
+systemctl disable map-backend.service 2>/dev/null || true
+systemctl disable map-frontend.service 2>/dev/null || true
 
 echo "[3/4] Removing service files..."
-rm -f /etc/systemd/system/uavmap-api.service
-rm -f /etc/systemd/system/uavmap-frontend.service
+rm -f /etc/systemd/system/map-backend.service
+rm -f /etc/systemd/system/map-frontend.service
 systemctl daemon-reload
 
 echo "[4/4] Removing installation directory..."

@@ -44,17 +44,17 @@ chmod -R 755 "$INSTALL_DIR"
 usermod -a -G dialout $SERVICE_USER 2>/dev/null || true
 
 echo "[5/6] Installing systemd services..."
-cp "$SCRIPT_DIR/uavmap-api.service" /etc/systemd/system/
-cp "$SCRIPT_DIR/uavmap-frontend.service" /etc/systemd/system/
+cp "$SCRIPT_DIR/map-backend.service" /etc/systemd/system/
+cp "$SCRIPT_DIR/map-frontend.service" /etc/systemd/system/
 
 # Reload systemd
 systemctl daemon-reload
 
 echo "[6/6] Enabling and starting services..."
-systemctl enable uavmap-api.service
-systemctl enable uavmap-frontend.service
-systemctl start uavmap-api.service
-systemctl start uavmap-frontend.service
+systemctl enable map-backend.service
+systemctl enable map-frontend.service
+systemctl start map-backend.service
+systemctl start map-frontend.service
 
 echo ""
 echo "=========================================="
@@ -62,18 +62,18 @@ echo "  Installation Complete!"
 echo "=========================================="
 echo ""
 echo "Services status:"
-systemctl status uavmap-api.service --no-pager -l || true
+systemctl status map-backend.service --no-pager -l || true
 echo ""
-systemctl status uavmap-frontend.service --no-pager -l || true
+systemctl status map-frontend.service --no-pager -l || true
 echo ""
 echo "URLs:"
 echo "  - Frontend: http://localhost:8080"
 echo "  - API:      http://localhost:5000"
 echo ""
 echo "Useful commands:"
-echo "  - View API logs:      sudo journalctl -u uavmap-api -f"
-echo "  - View Frontend logs: sudo journalctl -u uavmap-frontend -f"
-echo "  - Restart API:        sudo systemctl restart uavmap-api"
-echo "  - Restart Frontend:   sudo systemctl restart uavmap-frontend"
-echo "  - Stop all:           sudo systemctl stop uavmap-api uavmap-frontend"
+echo "  - View Backend logs:  sudo journalctl -u map-backend -f"
+echo "  - View Frontend logs: sudo journalctl -u map-frontend -f"
+echo "  - Restart Backend:    sudo systemctl restart map-backend"
+echo "  - Restart Frontend:   sudo systemctl restart map-frontend"
+echo "  - Stop all:           sudo systemctl stop map-backend map-frontend"
 echo ""

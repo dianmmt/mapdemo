@@ -100,7 +100,7 @@ function renderLocationList() {
   if (uavsWithDistance.length === 0) {
     listEl.innerHTML = `
       <div class="location-no-results">
-        <div class="no-result-icon">🔍</div>
+        
         <div class="no-result-title">Không tìm thấy UAV</div>
         <div class="no-result-desc">
           Không có UAV nào trong phạm vi ${LOCATION_RADIUS_KM}km<br>

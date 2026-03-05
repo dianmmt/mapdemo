@@ -11,9 +11,7 @@ function expandLeftPanel() {
   invalidateMap();
 }
 
-/* ══════════════════════════════════════════════
-   LEFT PANEL  –  Tab Switching
-══════════════════════════════════════════════ */
+
 function switchLeftTab(tabName) {
   // Only select tabs and content within #left-panel
   const tabs = document.querySelectorAll('#left-panel .sidebar-tab');

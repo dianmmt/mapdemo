@@ -89,7 +89,8 @@ function displayUAVData(data) {
   selectedIndices.clear();
 
   let validCount = 0;
-
+  const currentPost = getCurrentPosition();
+  console.log('Vị trí hiện tại:', currentPost);
   data.forEach((item, idx) => {
     const lat = getField(item, ['drone_lat', 'lat', 'latitude']);
     const lng = getField(item, ['drone_lon', 'lon', 'lng', 'longitude']);
@@ -97,6 +98,14 @@ function displayUAVData(data) {
     const deviceType = getField(item, UAV_KEYS.device_type);
 
     if (lat !== null && lng !== null && (lat !== 0 || lng !== 0)) {
+      // Chỉ hiện UAV trong bán kính 20km nếu có vị trí hiện tại
+      if (currentPost) {
+        const distance = calculateDistance(currentPost.lat, currentPost.lng, lat, lng);
+        if (distance > LOCATION_RADIUS_KM) {
+          return; // Bỏ qua UAV ngoài 20km
+        }
+      }
+      
       const marker = L.marker([lat, lng], { icon: dotIcon })
         .bindPopup(`
           <div class="popup-title">${deviceType || 'UAV #' + (idx + 1)}</div>
@@ -122,7 +131,8 @@ function displayUAVData(data) {
   renderSidebar();
   
   if (validCount > 0) {
-    setStatus('ok', `Đã tải ${validCount} thiết bị UAV với tọa độ hợp lệ.`);
+    const nearbyMsg = currentPost ? ' (trong 20km)' : '';
+    setStatus('ok', `Đã tải ${validCount} UAV${nearbyMsg}`);
   } else if (data.length > 0) {
     setStatus('warning', `Có ${data.length} UAV nhưng không có tọa độ hợp lệ.`);
   } else {
@@ -357,5 +367,57 @@ async function fetchAndPlot() {
     displayUAVData(data);
   }
 
-fetchAndPlot();
+// Tự động lấy vị trí GPS khi page load, sau đó fetch UAV data
+function initWithLocation() {
+  const latInput = document.getElementById('lat');
+  const lngInput = document.getElementById('lng');
+  const statusEl = document.getElementById('location-status');
+
+  if (!navigator.geolocation) {
+    console.log('GPS không được hỗ trợ, dùng vị trí mặc định Hà Nội');
+    // Fallback: Hà Nội
+    latInput.value = '21.024656';
+    lngInput.value = '105.773893';
+    if (statusEl) statusEl.innerHTML = '<div class="status-dot" style="background:#f59e0b"></div><span>Dùng vị trí mặc định</span>';
+    fetchAndPlot();
+    return;
+  }
+
+  if (statusEl) statusEl.innerHTML = '<div class="status-dot" style="background:#f59e0b;animation:blink 0.8s infinite"></div><span>Đang xác định vị trí...</span>';
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const lat = position.coords.latitude.toFixed(6);
+      const lng = position.coords.longitude.toFixed(6);
+      
+      latInput.value = lat;
+      lngInput.value = lng;
+      
+      if (statusEl) statusEl.innerHTML = '<div class="status-dot connected"></div><span>' + lat + ', ' + lng + '</span>';
+      
+      console.log('Đã lấy được vị trí GPS:', lat, lng);
+      
+      if (typeof updateCurrentLocationMarker === 'function') {
+        updateCurrentLocationMarker(lat, lng);
+      }
+      
+      fetchAndPlot();
+    },
+    (error) => {
+      console.log('Không lấy được GPS, dùng vị trí mặc định Hà Nội:', error.message);
+      // Fallback: Hà Nội
+      latInput.value = '21.024656';
+      lngInput.value = '105.773893';
+      if (statusEl) statusEl.innerHTML = '<div class="status-dot" style="background:#f59e0b"></div><span>Dùng vị trí mặc định (Hà Nội)</span>';
+      fetchAndPlot();
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    }
+  );
+}
+
+initWithLocation();
 

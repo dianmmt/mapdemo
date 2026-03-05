@@ -41,7 +41,7 @@ function makeDotIcon(color = '#e63946', size = 12) {
   });
 }
 
-const dotIcon    = makeDotIcon('#e63946', 12);
+const dotIcon    = makeDotIcon('#e63946', 12);  // Đỏ - UAV trong 20km
 const activeIcon = makeDotIcon('#f97316', 16);
 const selIcon    = makeDotIcon('#2563eb', 14);
 

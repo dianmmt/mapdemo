@@ -1,6 +1,9 @@
 console.log("map")
-const API_URL = 'http://localhost:5000/location';
-const UAV_API_URL = 'http://localhost:5000/drone-data';
+const BACKEND_HOST = window.location.hostname || 'localhost';
+const BACKEND_PORT = 5000;
+const BACKEND_BASE_URL = `http://${BACKEND_HOST}:${BACKEND_PORT}`;
+const API_URL = `${BACKEND_BASE_URL}/location`;
+const UAV_API_URL = `${BACKEND_BASE_URL}/drone-data`;
 const MAP_KEYS = {
   lat: ['lat', 'latitude', 'y'],
   lng: ['lng', 'lon', 'longitude', 'x'],

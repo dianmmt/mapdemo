@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', loadActivePorts);
 /* ══════════════════════════════════════════════
    LEFT PANEL  –  Serial Connection
 ══════════════════════════════════════════════ */
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = BACKEND_BASE_URL;
 let isConnected = false;
 let dataPollingInterval = null;
 

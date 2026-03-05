@@ -4,8 +4,6 @@ After=network.target
 
 [Service]
 Type=simple
-User=www-data
-Group=www-data
 WorkingDirectory=/opt/uavmap/backend
 Environment="PATH=/opt/uavmap/venv/bin"
 ExecStart=/opt/uavmap/venv/bin/python readingdata.py

@@ -2,6 +2,17 @@
 let currentTab = 'all';
 const LOCATION_RADIUS_KM = 20;
 
+let locationCurrentPage = 1;
+document.getElementById('lat').addEventListener('change', function () {
+  const lat = this.value;
+  const lng = document.getElementById('lng').value;
+  updateCurrentLocationMarker(lat, lng);
+});
+document.getElementById('lng').addEventListener('change', function () {
+  const lat = document.getElementById('lat').value;
+  const lng = this.value;
+  updateCurrentLocationMarker(lat, lng);
+});
 function switchTab(tabName) {
   currentTab = tabName;
   
@@ -56,7 +67,7 @@ function renderLocationList() {
   if (!currentPos) {
     listEl.innerHTML = `
       <div class="point-list-empty">
-        Chưa xác định vị trí hiện tại.<br>Vui lòng nhập tọa độ ở panel bên trái.
+        Chưa xác định vị trí hiện tại.<br>Nhập tọa độ ở panel bên trái.
       </div>
     `;
     if (countEl) countEl.textContent = '0';
@@ -93,8 +104,21 @@ function renderLocationList() {
     }
   });
   
-  uavsWithDistance.sort((a, b) => a.distance - b.distance);
-  
+  //uavsWithDistance.sort((a, b) => a.distance - b.distance);
+  uavsWithDistance.sort((a,b) =>{
+    const timeA = getField(a.item, UAV_KEYS.received_at);
+    const timeB = getField(b.item, UAV_KEYS.received_at);
+    if (!timeA && !timeB) return 0;
+    if (!timeA) return 1;
+    if (!timeB) return -1;
+    return new Date(timeB) - new Date(timeA);
+  })
+  const totalLocationPages = Math.ceil(uavsWithDistance.length / ITEMS_PER_PAGE);
+  if (locationCurrentPage > totalLocationPages) locationCurrentPage = Math.max(1, totalLocationPages);
+
+  const startIdx = (locationCurrentPage -1) * ITEMS_PER_PAGE;
+  const endIdx = startIdx + ITEMS_PER_PAGE;
+  const pageItems = uavsWithDistance.slice(startIdx, endIdx);
   if (countEl) countEl.textContent = uavsWithDistance.length;
   
   if (uavsWithDistance.length === 0) {
@@ -113,7 +137,7 @@ function renderLocationList() {
   
   listEl.innerHTML = '';
   
-  uavsWithDistance.forEach(({ item, idx, distance, lat, lng }) => {
+  pageItems.forEach(({ item, idx, distance, lat, lng }) => {
     const deviceType = getField(item, UAV_KEYS.device_type) || `UAV #${idx + 1}`;
     const freq = getField(item, UAV_KEYS.freq);
     const receivedAt = getField(item, UAV_KEYS.received_at);
@@ -159,9 +183,12 @@ function renderLocationList() {
     
     listEl.appendChild(card);
   });
+  
+  renderLocationPagination(uavsWithDistance.length, totalLocationPages);
 }
 
 function updateLocationTabOnPositionChange() {
+  locationCurrentPage = 1;
   if (currentTab === 'location') {
     renderLocationList();
   }
@@ -181,6 +208,47 @@ function updateLocationTabOnPositionChange() {
       countEl.textContent = count;
     }
   }
+}
+function renderLocationPagination(totalItems, totalPages) {
+  let paginationEl = document.getElementById('location-pagination');
+
+  if ( ! paginationEl){
+    paginationEl = document.createElement('div');
+    paginationEl.id = 'location-pagination';
+    paginationEl.className = 'pagination';
+    const listEl = document.getElementById('location-list');
+    listEl.parentNode.insertBefore(paginationEl, listEl.nextSibling);
+  }
+
+  if(totalPages <=1){
+    paginationEl.style.display = 'none';
+    return;
+  }
+
+  paginationEl.style.display = 'flex';
+  paginationEl.innerHTML = `
+    <button class="page-btn" onclick="goToLocationPage(1)" ${locationCurrentPage === 1 ? 'disabled' : ''} title="Trang đầu">«</button>
+    <button class="page-btn" onclick="prevLocationPage()" ${locationCurrentPage === 1 ? 'disabled' : ''} title="Trang trước">‹</button>
+    <span class="page-info">${locationCurrentPage} / ${totalPages}</span>
+    <button class="page-btn" onclick="nextLocationPage()" ${locationCurrentPage === totalPages ? 'disabled' : ''} title="Trang sau">›</button>
+    <button class="page-btn" onclick="goToLocationPage(${totalPages})" ${locationCurrentPage === totalPages ? 'disabled' : ''} title="Trang cuối">»</button>
+  `;
+}
+
+function prevLocationPage(){
+  if (locationCurrentPage >1){
+    locationCurrentPage--;
+    renderLocationList();
+  }
+}
+
+function nextLocationPage(){
+  locationCurrentPage++;
+  renderLocationList();
+}
+function goToLocationPage(page){
+  locationCurrentPage = page;
+  renderLocationList();
 }
 
 const originalDisplayUAVData = displayUAVData;

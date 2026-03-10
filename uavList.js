@@ -14,6 +14,7 @@ const UAV_KEYS = {
   };
 
 const ITEMS_PER_PAGE = 10;
+const TIME_LIMIT_MINUTES = 10;
 let currentPage = 1;
 
 function getField(obj, candidates) {
@@ -106,6 +107,17 @@ function displayUAVData(data) {
         }
       }
       
+      // Lọc theo thời gian - chỉ hiện UAV trong 10 phút gần nhất
+      const receivedAt = getField(item, UAV_KEYS.received_at);
+      if (receivedAt) {
+        const receivedTime = new Date(receivedAt);
+        const now = new Date();
+        const diffMinutes = (now - receivedTime) / (1000 * 60);
+        if (diffMinutes > TIME_LIMIT_MINUTES) {
+          return;
+        }
+      }
+      
       const marker = L.marker([lat, lng], { icon: dotIcon })
         .bindPopup(`
           <div class="popup-title">${deviceType || 'UAV #' + (idx + 1)}</div>
@@ -131,7 +143,7 @@ function displayUAVData(data) {
   renderSidebar();
   
   if (validCount > 0) {
-    const nearbyMsg = currentPost ? ' (trong 20km)' : '';
+    const nearbyMsg = currentPost ? ' trong phạm vi 20km' : '';
     setStatus('ok', `Đã tải ${validCount} UAV${nearbyMsg}`);
   } else if (data.length > 0) {
     setStatus('warning', `Có ${data.length} UAV nhưng không có tọa độ hợp lệ.`);
@@ -148,14 +160,33 @@ function renderSidebar() {
 
   listEl.innerHTML = '';
 
+  const now = new Date();
   const filtered = allData.filter((item, idx) => {
+    // Lọc theo thời gian - chỉ hiện UAV trong 10 phút gần nhất
+    const receivedAt = getField(item, UAV_KEYS.received_at);
+    if (receivedAt) {
+      const receivedTime = new Date(receivedAt);
+      const diffMinutes = (now - receivedTime) / (1000 * 60);
+      if (diffMinutes > TIME_LIMIT_MINUTES) {
+        return false;
+      }
+    }
+    
     if (!searchQuery) return true;
     const name = getDeviceName(item, idx).toLowerCase();
     const freq = getField(item, UAV_KEYS.freq);
     const freqStr = freq ? freq.toString() : '';
     return name.includes(searchQuery) || freqStr.includes(searchQuery);
   });
-
+  filtered.sort((a,b) =>{ //filter đổi thứ tự 
+    const timeA = getField(a, UAV_KEYS.received_at);
+    const timeB = getField(b, UAV_KEYS.received_at);
+    if (!timeA && !timeB) return 0;
+    if (!timeA) return 1;
+    if (!timeB) return -1;
+    return new Date(timeB) - new Date(timeA);
+  })
+  
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
   
@@ -192,7 +223,7 @@ function renderSidebar() {
     card.addEventListener('click', () => {
       toggleSelect(idx);
       if (hasCoords && markerMap[idx]) {
-        map.flyTo([lat, lng], 14, { duration: 0.8 });
+        //map.flyTo([lat, lng], 14, { duration: 0.8 });
         markerMap[idx].openPopup();
       }
     });
@@ -251,7 +282,18 @@ function prevPage() {
 }
 
 function nextPage() {
+  const now = new Date();
   const filtered = allData.filter((item, idx) => {
+    // Lọc theo thời gian
+    const receivedAt = getField(item, UAV_KEYS.received_at);
+    if (receivedAt) {
+      const receivedTime = new Date(receivedAt);
+      const diffMinutes = (now - receivedTime) / (1000 * 60);
+      if (diffMinutes > TIME_LIMIT_MINUTES) {
+        return false;
+      }
+    }
+    
     if (!searchQuery) return true;
     const name = getDeviceName(item, idx).toLowerCase();
     const freq = getField(item, UAV_KEYS.freq);

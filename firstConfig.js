@@ -24,9 +24,7 @@ function switchLeftTab(tabName) {
   document.getElementById(`left-tab-content-${tabName}`).classList.add('active');
 }
 
-/* ══════════════════════════════════════════════
-   LEFT PANEL  –  drag to resize
-══════════════════════════════════════════════ */
+
 (function () {
   const handle = document.getElementById('left-panel-resize-handle');
   let dragging = false, startX, startW;
@@ -77,9 +75,7 @@ function switchLeftTab(tabName) {
   document.addEventListener('touchend', () => { dragging = false; });
 })();
 
-/* ══════════════════════════════════════════════
-   LEFT PANEL  –  Current Location & Marker
-══════════════════════════════════════════════ */
+
 let currentLocationMarker = null;
 
 function createCurrentLocationIcon() {
@@ -87,16 +83,16 @@ function createCurrentLocationIcon() {
     className: '',
     html: `<div style="
       width: 20px; height: 20px;
-      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
       border: 3px solid #fff;
       border-radius: 50%;
-      box-shadow: 0 0 0 4px rgba(59,130,246,0.3), 0 4px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.3), 0 4px 12px rgba(0,0,0,0.3);
       animation: currentLocPulse 2s ease-in-out infinite;
     "></div>
     <style>
       @keyframes currentLocPulse {
-        0%, 100% { box-shadow: 0 0 0 4px rgba(59,130,246,0.3), 0 4px 12px rgba(0,0,0,0.3); }
-        50% { box-shadow: 0 0 0 8px rgba(59,130,246,0.15), 0 4px 12px rgba(0,0,0,0.3); }
+        0%, 100% { box-shadow: 0 0 0 4px rgba(34,197,94,0.3), 0 4px 12px rgba(0,0,0,0.3); }
+        50% { box-shadow: 0 0 0 8px rgba(34,197,94,0.15), 0 4px 12px rgba(0,0,0,0.3); }
       }
     </style>`,
     iconSize: [20, 20],
@@ -184,7 +180,7 @@ function goToLocation() {
   statusEl.innerHTML = '<div class="status-dot connected"></div><span>' + latNum.toFixed(6) + ', ' + lngNum.toFixed(6) + '</span>';
   
   if (window.map) {
-    map.flyTo([latNum, lngNum], 15, { duration: 1.5 });
+    map.flyTo([latNum, lngNum], 10, { duration: 1.5 });
     setTimeout(() => {
       if (currentLocationMarker) currentLocationMarker.openPopup();
     }, 1600);
@@ -260,9 +256,7 @@ function getCurrentLocation() {
   );
 }
 
-/* ══════════════════════════════════════════════
-   LEFT PANEL  –  Load Active COM Ports from Backend
-══════════════════════════════════════════════ */
+
 async function loadActivePorts(showFeedback = false) {
   const comSelect = document.getElementById('com-port');
   const refreshBtn = document.querySelector('.btn-refresh-ports');
@@ -318,9 +312,6 @@ async function loadActivePorts(showFeedback = false) {
 // Tải danh sách ports khi trang load
 document.addEventListener('DOMContentLoaded', loadActivePorts);
 
-/* ══════════════════════════════════════════════
-   LEFT PANEL  –  Serial Connection
-══════════════════════════════════════════════ */
 const BACKEND_URL = BACKEND_BASE_URL;
 let isConnected = false;
 let dataPollingInterval = null;

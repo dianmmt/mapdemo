@@ -41,13 +41,9 @@ function makeDotIcon(color = '#e63946', size = 12) {
   });
 }
 
-const dotIcon    = makeDotIcon('#e63946', 12);  // Đỏ - UAV trong 20km
+const dotIcon    = makeDotIcon('#e63946', 12);  // Đỏ - UAV 
 const activeIcon = makeDotIcon('#f97316', 16);
 const selIcon    = makeDotIcon('#2563eb', 14);
-
-// ──────────────────────────────────────────
-// STATUS / TOAST
-// ──────────────────────────────────────────
 function setStatus(state, msg) {
   document.getElementById('status-indicator').className = state;
   document.getElementById('status-text').textContent = msg;
@@ -60,25 +56,7 @@ function showToast(msg, dur = 2500) {
 }
 
 
-// ──────────────────────────────────────────
-// DEMO DATA
-// ──────────────────────────────────────────
-// function useDemoData() {
-//   const demo = [
-//     { device_type: 'DJI Mavic 2 Pro', freq: 5756.5 },
-//     { device_type: 'DJI Phantom 4', freq: 5816.5 },
-//     { device_type: 'DJI Mini 3 Pro', freq: 5776.5 },
-//     { device_type: 'DJI Air 2S', freq: 5836.5 },
-//     { device_type: 'Autel EVO II', freq: 5796.5 },
-//   ];
-//   displayUAVData(demo);
-//   setStatus('error', ' Demoo.');
-//   showToast('⚠ Đang dùng dữ liệu demo');
-// }
 
-// ──────────────────────────────────────────
-// SIDEBAR RENDER
-// ──────────────────────────────────────────
 let searchQuery = '';
 
 document.getElementById('search-box').addEventListener('input', function() {
@@ -211,9 +189,7 @@ map.on('click', function(e) {
   selectMeasurePoint(e.latlng, null, null);
 });
 
-// ──────────────────────────────────────────
-// DRAGGABLE DIST PANEL
-// ──────────────────────────────────────────
+
 (function () {
   const panel  = document.getElementById('dist-panel');
   const handle = document.getElementById('dist-drag-handle');
@@ -264,9 +240,6 @@ map.on('click', function(e) {
   }).observe(panel, { attributes: true, attributeFilter: ['class'] });
 })();
 
-// ──────────────────────────────────────────
-// RESIZE OBSERVER - auto invalidate map on container resize
-// ──────────────────────────────────────────
 const mapContainer = document.getElementById('map');
 if (window.ResizeObserver) {
   const resizeObserver = new ResizeObserver(() => {
@@ -277,7 +250,5 @@ if (window.ResizeObserver) {
   resizeObserver.observe(mapContainer);
 }
 
-// ──────────────────────────────────────────
-// BOOT
-// ──────────────────────────────────────────
+
 

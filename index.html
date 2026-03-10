@@ -275,10 +275,6 @@
 
 <script>
 
-
-/* ══════════════════════════════════════════════
-   SIDEBAR (RIGHT)  –  collapse / expand
-══════════════════════════════════════════════ */
 const sidebar    = document.getElementById('sidebar');
 const expandTab  = document.getElementById('sidebar-expand-tab');
 const layout     = document.getElementById('layout');
@@ -318,9 +314,6 @@ leftPanel.addEventListener('transitionend', () => {
   if (window.map) window.map.invalidateSize({ animate: false, pan: false });
 });
 
-/* ══════════════════════════════════════════════
-   SIDEBAR  –  drag to resize
-══════════════════════════════════════════════ */
 (function () {
   const handle = document.getElementById('sidebar-resize-handle');
   let dragging = false, startX, startW;
